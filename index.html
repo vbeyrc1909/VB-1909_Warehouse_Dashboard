@@ -19,142 +19,153 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <style>
+      h3 {
+      font-family: Arial, Helvetica, sans-serif;
+      margin-bottom: -2px;
+      margin-top :10px;
+      }
+      #t01 tr:nth-child(even) {
+        background-color: #eee;
+        height: 30px;
+      }
+      #t01 tr:nth-child(odd) {
+      background-color: #fff;
+      height: 30px;
+      }
+      #t01 th {
+        background-color: black;
+        color: white;
+      }
+    </style>
 </head>
-<header>
-    <center>
-        <div id="eyantraLogo">
-            <!-- eyantra logo -->
-            <img src="https://eyic.e-yantra.org/img/eYantra_logo_whitetext.png" alt="e_yantra_logo" width="290" height="60"><br>
-        </div>
-    </center>
-</header>
+
 <body>
-    <center><h2>VB#1909 Dashboard Module</h2></center>
-    <hr style="height:4px;border-width:0;color:gray;background-color:gray">
+  <header>
+    <div id="eyantraLogo" style="text-align: center;">
+        <!-- eyantra logo -->
+        <img src="https://eyic.e-yantra.org/img/eYantra_logo_whitetext.png" alt="e_yantra_logo" width="290" height="60"/><br>
+    </div>
+  </header>
+
+    <h2 style="text-align: center;">VB#1909 Dashboard Module</h2>
+    <hr style="height:4px;border-width:0;color:gray;background-color:gray;">
     <div id="map" style="width: 100%; height: 320px;"></div>
-    <hr style="height:4px;border-width:0;color:gray;background-color:gray">
-</body>
+    <hr style="height:4px;border-width:0;color:gray;background-color:gray;">
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script>
-    /////////////Ajax Requests////////////
-    $(document).ready(function() {
-        // Fetch the initial Map
-        refreshMap();
-    
-        // Fetch every 5 second
-        setInterval(refreshMap, 5000);
-    });
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script>
+      /////////////Ajax Requests////////////
+      $(document).ready(function() {
+          // Fetch the initial Map
+          refreshMap();
+      
+          // Fetch every 5 second
+          setInterval(refreshMap, 5000);
+      });
 
-    function refreshMap(){
-        var container = L.DomUtil.get('map');
+      function refreshMap(){
+          var container = L.DomUtil.get('map');
 
-      	if(container != null){
-        container._leaflet_id = null;
-        }
-         
-        var map = L.map('map').setView([20.5937, 78.9629], 3.5);
-        var jsonDataObject =[];
+          if(container != null){
+          container._leaflet_id = null;
+          }
+          
+          var map = L.map('map').setView([20.5937, 78.9629], 3.5);
+          var jsonDataObject =[];
 
-        var greenIcon = new L.Icon({
-           iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-           shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-           iconSize: [25, 41],
-           iconAnchor: [12, 41],
-           popupAnchor: [1, -34],
-           shadowSize: [41, 41]
-        });
+          var greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          });
 
-        var yellowIcon = new L.Icon({
-           iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
-           shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-           iconSize: [25, 41],
-           iconAnchor: [12, 41],
-           popupAnchor: [1, -34],
-           shadowSize: [41, 41]
-        });
+          var yellowIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          });
 
-        var redIcon = new L.Icon({
-           iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-           shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-           iconSize: [25, 41],
-           iconAnchor: [12, 41],
-           popupAnchor: [1, -34],
-           shadowSize: [41, 41]
-        });
+          var redIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          });
 
-        $.getJSON('https://spreadsheets.google.com/feeds/list/1mnVSPe1YvHQRCEySwqmz71y-pxs_T2yWGzqYsoo5mDs/5/public/full?alt=json', function(data) {
-        for (var i = 0; i < data.feed.entry.length; ++i) {
+          $.getJSON('https://spreadsheets.google.com/feeds/list/1mnVSPe1YvHQRCEySwqmz71y-pxs_T2yWGzqYsoo5mDs/5/public/full?alt=json', function(data) {
+          for (var i = 0; i < data.feed.entry.length; ++i) {
 
-            var json_data = {
-                "City": data.feed.entry[i].gsx$city.$t,
-                "OrderID" : data.feed.entry[i].gsx$orderid.$t,
-                "Item" : data.feed.entry[i].gsx$item.$t,
-                "Dispatched" : data.feed.entry[i].gsx$dispatched.$t,
-                "Shipped" : data.feed.entry[i].gsx$shipped.$t,
-                "Latitude": parseFloat(data.feed.entry[i].gsx$latitude.$t),
-                "Longitude": parseFloat(data.feed.entry[i].gsx$longitude.$t)
-            };
+              var json_data = {
+                  "City": data.feed.entry[i].gsx$city.$t,
+                  "OrderID" : data.feed.entry[i].gsx$orderid.$t,
+                  "Item" : data.feed.entry[i].gsx$item.$t,
+                  "Dispatched" : data.feed.entry[i].gsx$dispatched.$t,
+                  "Shipped" : data.feed.entry[i].gsx$shipped.$t,
+                  "Latitude": parseFloat(data.feed.entry[i].gsx$latitude.$t),
+                  "Longitude": parseFloat(data.feed.entry[i].gsx$longitude.$t)
+              };
 
-            jsonDataObject.push(json_data);
-                
-            for (var j = 0; j < jsonDataObject.length; j++) {
-                if(jsonDataObject[j].Dispatched=="YES" && jsonDataObject[j].Shipped=="YES"){
-                    var marker = L.marker(L.latLng(parseFloat(jsonDataObject[j].Latitude), parseFloat(jsonDataObject[j].Longitude)),{icon: greenIcon});
-                    marker.bindPopup(jsonDataObject[j].City, {
-                            autoClose: false
-                });
-                }
-                else if(jsonDataObject[j].Dispatched=="YES" && jsonDataObject[j].Shipped==""){
-                    var marker = L.marker(L.latLng(parseFloat(jsonDataObject[j].Latitude), parseFloat(jsonDataObject[j].Longitude)),{icon: yellowIcon});
-                    marker.bindPopup(jsonDataObject[j].City, {
-                            autoClose: false
-                });
-                }
+              jsonDataObject.push(json_data);
+                  
+              for (var j = 0; j < jsonDataObject.length; j++) {
+                  if(jsonDataObject[j].Dispatched=="YES" && jsonDataObject[j].Shipped=="YES"){
+                      var marker = L.marker(L.latLng(parseFloat(jsonDataObject[j].Latitude), parseFloat(jsonDataObject[j].Longitude)),{icon: greenIcon});
+                      marker.bindPopup(jsonDataObject[j].City, {
+                              autoClose: false
+                  });
+                  }
+                  else if(jsonDataObject[j].Dispatched=="YES" && jsonDataObject[j].Shipped==""){
+                      var marker = L.marker(L.latLng(parseFloat(jsonDataObject[j].Latitude), parseFloat(jsonDataObject[j].Longitude)),{icon: yellowIcon});
+                      marker.bindPopup(jsonDataObject[j].City, {
+                              autoClose: false
+                  });
+                  }
 
-                else if(jsonDataObject[j].Dispatched=="" && jsonDataObject[j].Shipped==""){
-                    var marker = L.marker(L.latLng(parseFloat(jsonDataObject[j].Latitude), parseFloat(jsonDataObject[j].Longitude)),{icon: redIcon});
-                    marker.bindPopup(jsonDataObject[j].City, {
-                            autoClose: false
-                });
-                }
+                  else if(jsonDataObject[j].Dispatched=="" && jsonDataObject[j].Shipped==""){
+                      var marker = L.marker(L.latLng(parseFloat(jsonDataObject[j].Latitude), parseFloat(jsonDataObject[j].Longitude)),{icon: redIcon});
+                      marker.bindPopup(jsonDataObject[j].City, {
+                              autoClose: false
+                  });
+                  }
 
-                map.addLayer(marker);
-                marker.on('click', onClick_Marker)
-                // Attach the corresponding JSON data to your marker:
-                marker.myJsonData =jsonDataObject[j];
-                if (marker.myJsonData.Shipped==""){
-                  marker.myJsonData.Shipped="NO";
-                }
-        
-                function onClick_Marker(e) {
-                        var marker = e.target;
-                        popup = L.popup()
-                        .setLatLng(marker.getLatLng())
-                        .setContent("Order ID: " + marker.myJsonData.OrderID + " || Item: " + marker.myJsonData.Item + " || Dispatched: "+ marker.myJsonData.Dispatched + " || Shipped: "+ marker.myJsonData.Shipped)
-                        .openOn(map);
-                    }
+                  map.addLayer(marker);
+                  marker.on('click', onClick_Marker)
+                  // Attach the corresponding JSON data to your marker:
+                  marker.myJsonData =jsonDataObject[j];
+                  if (marker.myJsonData.Shipped==""){
+                    marker.myJsonData.Shipped="NO";
+                  }
+          
+                  function onClick_Marker(e) {
+                          var marker = e.target;
+                          popup = L.popup()
+                          .setLatLng(marker.getLatLng())
+                          .setContent("Order ID: " + marker.myJsonData.OrderID + " || Item: " + marker.myJsonData.Item + " || Dispatched: "+ marker.myJsonData.Dispatched + " || Shipped: "+ marker.myJsonData.Shipped)
+                          .openOn(map);
+                      }
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map); 
-                }
-            }
-        });
-    }
+                  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                          attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                  }).addTo(map); 
+                  }
+              }
+          });
+      }
 
-</script>
-<style>
-    h3 {
-    font: Arial, Geneva, Helvetica, sans-serif;
-    margin-bottom: -2px;
-    margin-top :10px;
-    }
-</style>
-<body>
-    <center><h3>Time taken for items to be Shipped</h3></center>
+  </script>
+
+    <h3 style="text-align: center;">Time taken for items to be Shipped</h3>
     <div id="column_chart" style="width: 100%; height: 350px; display: block; margin-top: 0px; padding-top: 0px;float: none;"></div>
-  </body>
   <script type="text/javascript">
     $(document).ready(function() {
       // Fetch the initial Chart
@@ -219,24 +230,9 @@
       });	 
     }
   </script>
-<style>
-#t01 tr:nth-child(even) {
-  background-color: #eee;
-  height: 30px;
-}
-#t01 tr:nth-child(odd) {
- background-color: #fff;
- height: 30px;
-}
-#t01 th {
-  background-color: black;
-  color: white;
-}
-</style>
-<body>
     <hr style="height:4px;border-width:0;color:gray;background-color:gray">
    
-       <center><table id="t01" border='1' width="100%">  
+       <table style = "text-align: center;; width: 100%; border: 1rem;" id="t01">  
         <tr style='height: 50px;'>
             <th>Order ID</th>
             <th>Item</th>
@@ -251,13 +247,10 @@
         </tr>
         <tbody id="tableContent">
         </tbody>
-    </table></center>
+    </table>
 
     <hr style="height:4px;border-width:0;color:gray;background-color:gray">
-
-</body>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
 <script>
 /////////////Ajax Requests////////////
@@ -300,3 +293,5 @@ function refreshTable(){
 }	
 
 </script>
+</body>
+</html> 
